@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 
-import sys, smtplib, getpass, socket, subprocess, argparse, Queue
-from email.MIMEText import MIMEText
-from email.Header import Header
-from email.Utils import formatdate
+import sys, argparse, json, requests, Queue
 
 def main(args):
-
     q = Queue.Queue(args.num)
 
     for line in sys.stdin:
@@ -22,31 +18,18 @@ def main(args):
         line = q.get()
         message = message + line
 
-    from_address = getpass.getuser() + '@' + socket.gethostname()
-    to_address   = args.to
+    if args.to:
+        message = '@' + args.to + ' ' + message
 
-    charset = "utf-8"
-    subject = "Ntfy"
-    text    = message
-    
-    msg = MIMEText(text.encode(charset), "plain", charset)
-    msg["Subject"] = Header(subject, charset)
-    msg["From"]    = args.fro
-    msg["To"]      = to_address
-    msg["Date"]    = formatdate(localtime=True)
-
-    smtp = smtplib.SMTP(args.host, args.port)
-    smtp.sendmail(from_address,to_address,msg.as_string())
-    smtp.close()
+    payload = {'text': message, 'username': args.name}
+    r = requests.post(args.url, data=json.dumps(payload))
 
 if __name__ == "__main__":
-    defaultFrom = getpass.getuser() + '@' + socket.gethostname()
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-t', '--to', required=True, help='To address')
-    parser.add_argument('-s', '--host', required=False, default='localhost', help='Host name')
-    parser.add_argument('-p', '--port', required=False, default=25, help='Port number')
-    parser.add_argument('-f', '--fro', required=False, default=defaultFrom, help='From address')
+    parser = argparse.ArgumentParser(description='Notify to slack.')
+    parser.add_argument('-u', '--url', required=True, help='Web hook url')
+    parser.add_argument('-t', '--to', required=False, help='To user name')
     parser.add_argument('-n', '--num', required=False, default=100, help='Number of lines of stdin included in e-mail')
+    parser.add_argument('-f', '--name', required=False, default='ntfy bot', help='Name shown on slack')
     args = parser.parse_args()
     print args
     main(args)
