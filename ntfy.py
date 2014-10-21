@@ -33,5 +33,4 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--name', required=False, default='ntfy bot', help='Name shown on slack')
     parser.add_argument('-e', '--echo', action='store_true', help='Turn on echo back')
     args = parser.parse_args()
-    print args
     main(args)
