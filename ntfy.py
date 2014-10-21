@@ -7,8 +7,9 @@ def main(args):
     q = Queue.Queue(args.num)
 
     for line in sys.stdin:
-        sys.stdout.write(line)
-        sys.stdout.flush()
+        if args.echo:
+            sys.stdout.write(line)
+            sys.stdout.flush()
         if q.full():
             q.get()
         q.put(line)
@@ -30,6 +31,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--to', required=False, help='To user name')
     parser.add_argument('-n', '--num', required=False, default=100, help='Number of lines of stdin included in e-mail')
     parser.add_argument('-f', '--name', required=False, default='ntfy bot', help='Name shown on slack')
+    parser.add_argument('-e', '--echo', action='store_true', help='Turn on echo back')
     args = parser.parse_args()
     print args
     main(args)
