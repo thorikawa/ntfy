@@ -15,9 +15,12 @@ def main(args):
         q.put(line)
 
     message = ""
-    while not q.empty():
-        line = q.get()
-        message = message + line
+    if args.message:
+        message = args.message
+    else:
+        while not q.empty():
+            line = q.get()
+            message = message + line
 
     if args.to:
         message = '@' + args.to + ' ' + message
@@ -37,6 +40,6 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--name', required=False, default='ntfy bot', help='Name shown on slack')
     parser.add_argument('-e', '--echo', action='store_true', help='Turn on echo back')
     parser.add_argument('-i', '--icon', required=False, default='http://thorikawa.github.io/ntfy/icon_128.png', help='Icon URL')
-    parser.add_argument('-m', '--message', required=False, help='Send the given message instead of stdin')
+    parser.add_argument('-m', '--message', required=False, help='Send the given message instead of stdin. If this option is specified, -n(--num) option will be ignored.')
     args = parser.parse_args()
     main(args)
