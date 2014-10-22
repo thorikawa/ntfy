@@ -23,6 +23,10 @@ def main(args):
         message = '@' + args.to + ' ' + message
 
     payload = {'text': message, 'username': args.name, 'icon_url': ''}
+
+    if args.to:
+        payload['link_names'] = 1
+
     r = requests.post(args.url, data=json.dumps(payload))
 
 if __name__ == "__main__":
@@ -33,5 +37,6 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--name', required=False, default='ntfy bot', help='Name shown on slack')
     parser.add_argument('-e', '--echo', action='store_true', help='Turn on echo back')
     parser.add_argument('-i', '--icon', required=False, default='http://thorikawa.github.io/ntfy/icon_128.png', help='Icon URL')
+    parser.add_argument('-m', '--message', required=False, help='Send the given message instead of stdin')
     args = parser.parse_args()
     main(args)
